@@ -1,7 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_application_1/practice.dart';
+import 'firebase_options.dart';
+// import 'package:flutter_application_1/sharedprefsfile.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
+}
+
+MaterialColor createMaterialColor(Color color) {
+  List strengths = <double>[.05];
+  final swatch = <int, Color>{};
+  final r = color.red, g = color.green, b = color.blue;
+
+  for (int i = 1; i < 10; i++) {
+    strengths.add(0.1 * i);
+  }
+  for (var strength in strengths) {
+    final ds = 0.5 - strength;
+    swatch[(strength * 1000).round()] = Color.fromRGBO(
+      r + ((ds < 0 ? r : (255 - r)) * ds).round(),
+      g + ((ds < 0 ? g : (255 - g)) * ds).round(),
+      b + ((ds < 0 ? b : (255 - b)) * ds).round(),
+      1,
+    );
+  }
+  return MaterialColor(color.value, swatch);
 }
 
 class MyApp extends StatelessWidget {
@@ -10,29 +37,40 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hotR
-        // restart insrtead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 255, 0, 128),
-        ),
+    // Yaha se system navigation bar aur status bar dono ka color set kar sakte ho
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, // gradient ke liye transparent
+        statusBarIconBrightness: Brightness.dark, // ya Brightness.light
+        systemNavigationBarColor: Color(0xFFF8F9FA), // bottom bar
+        systemNavigationBarIconBrightness: Brightness.dark,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      child: MaterialApp(
+        title: 'Tech Login',
+        //light theme
+        theme: ThemeData(
+          // brightness: Brightness.light,
+          fontFamily: 'SF Pro Display',
+          scaffoldBackgroundColor: const Color(0xFFF8F9FA),
+          primaryColor: const Color(0xFF282C5C),
+          colorScheme: const ColorScheme.light(
+            primary: Color(0xFF282C5C),
+            secondary: Color(0xFF282C5C),
+          ),
+        ),
+        darkTheme: ThemeData(
+          // brightness: Brightness.dark,
+          fontFamily: 'SF Pro Display',
+          scaffoldBackgroundColor: const Color(0xFF282C5C),
+          primaryColor: const Color(0xFFF8F9FA),
+          colorScheme: const ColorScheme.light(
+            primary: Color(0xFFF8F9FA),
+            secondary: Color(0xFFF8F9FA),
+          ),
+        ),
+        themeMode: ThemeMode.light,
+        home:  Practice(),
+      ),
     );
   }
 }
@@ -57,7 +95,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  String _message = "Welcome!";
+  final String _message = "Welcome!";
 
   void _incrementCounter() {
     setState(() {
